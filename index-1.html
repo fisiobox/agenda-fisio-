@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agenda Fisio</title>
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Agenda Fisio">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1F4B3F">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F6F4EF;
+    --surface: #FFFFFF;
+    --ink: #21262A;
+    --ink-soft: #6B7268;
+    --accent: #1F4B3F;
+    --accent-soft: #E7EEEA;
+    --border: #E3DFD3;
+    --free: #3F7A5A;
+    --free-soft: #E9F1EC;
+    --busy: #B5484B;
+    --busy-soft: #FBEBEB;
+    --partial: #C08A3E;
+    --partial-soft: #FBF1E1;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    font-family:'Inter', sans-serif;
+    color:var(--ink);
+    padding:0 0 40px;
+    -webkit-font-smoothing:antialiased;
+  }
+  header{
+    padding:26px 20px 18px;
+    border-bottom:1px solid var(--border);
+  }
+  .stamp{
+    display:block;
+    font-family:'Fraunces', serif;
+    font-optical-sizing:auto;
+    font-weight:500;
+    font-size:26px;
+    letter-spacing:0.3px;
+    color:var(--ink);
+  }
+  .subtitle{
+    margin:6px 0 0;
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+  .demo-badge{
+    display:inline-block;
+    margin-top:12px;
+    font-size:11px;
+    letter-spacing:0.3px;
+    color:var(--accent);
+    background:var(--accent-soft);
+    padding:4px 10px;
+    border-radius:20px;
+  }
+  .backup-row{
+    display:flex;
+    gap:8px;
+    margin-top:12px;
+    flex-wrap:wrap;
+  }
+  .backup-btn{
+    font-size:11.5px;
+    font-weight:500;
+    color:var(--ink);
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:7px 12px;
+    cursor:pointer;
+    display:inline-block;
+  }
+  .tabs{
+    display:flex;
+    padding:16px 20px 0;
+    gap:6px;
+  }
+  .tab{
+    flex:1;
+    text-align:center;
+    font-family:'Inter', sans-serif;
+    font-weight:500;
+    font-size:13px;
+    padding:9px 4px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:20px;
+    color:var(--ink-soft);
+    cursor:pointer;
+  }
+  .tab.active{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+  }
+  main{
+    padding:18px 16px 0;
+  }
+  .month{
+    margin:0 0 18px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:16px 16px 18px;
+  }
+  .month-name{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:16px;
+    color:var(--ink);
+    text-transform:capitalize;
+    margin-bottom:12px;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(7, 1fr);
+    gap:4px;
+  }
+  .dow{
+    font-size:10px;
+    text-align:center;
+    color:var(--ink-soft);
+    font-weight:500;
+    padding-bottom:4px;
+  }
+  .day{
+    aspect-ratio:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    font-size:13px;
+    border-radius:8px;
+    cursor:pointer;
+    background:transparent;
+    border:1px solid transparent;
+    position:relative;
+  }
+  .day.empty{visibility:hidden;}
+  .day.today{border:1px solid var(--accent); font-weight:600; color:var(--accent);}
+  .day.selected{background:var(--accent); color:#fff;}
+  .day.selected.today{border-color:#fff;}
+  .dot{
+    width:5px;height:5px;border-radius:50%;
+    margin-top:3px;
+  }
+  .dot.free{background:var(--free);}
+  .dot.partial{background:var(--partial);}
+  .dot.busy{background:var(--busy);}
+  .dot.none{background:transparent;}
+  .legend{
+    display:flex;
+    gap:16px;
+    padding:12px 20px 0;
+    font-size:11px;
+    color:var(--ink-soft);
+    flex-wrap:wrap;
+  }
+  .legend span{display:flex;align-items:center;gap:6px;}
+  .legend .dot{margin-top:0;}
+  .detail{
+    margin:18px 16px 0;
+    padding:18px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+  }
+  .detail-title{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:16px;
+    margin-bottom:12px;
+    color:var(--ink);
+  }
+  .slots{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .slot-row{
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+    border-left-width:3px;
+  }
+  .slot-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:11px 13px;
+    font-size:13px;
+    cursor:pointer;
+  }
+  .slot-head .time{font-weight:600; font-variant-numeric:tabular-nums;}
+  .slot-head .who{font-size:12px; color:var(--ink-soft); flex:1; margin-left:10px; text-align:right;}
+  .slot-row.free{border-left-color:var(--free);}
+  .slot-row.free .slot-head{background:var(--free-soft); color:var(--free);}
+  .slot-row.booked{border-left-color:var(--busy);}
+  .slot-row.booked .slot-head{background:var(--busy-soft); color:var(--busy);}
+  .slot-form{
+    padding:14px;
+    background:var(--surface);
+    border-top:1px solid var(--border);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .slot-form label{
+    font-size:11px;
+    color:var(--ink-soft);
+    font-weight:500;
+    display:block;
+    margin-bottom:3px;
+  }
+  .slot-form input{
+    width:100%;
+    padding:9px 11px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    background:var(--bg);
+    font-family:'Inter', sans-serif;
+    font-size:14px;
+    color:var(--ink);
+  }
+  .slot-form input:focus{
+    outline:none;
+    border-color:var(--accent);
+  }
+  .slot-form .btn-row{
+    display:flex;
+    gap:8px;
+    margin-top:4px;
+  }
+  .slot-form button{
+    flex:1;
+    padding:10px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    font-family:'Inter', sans-serif;
+    font-weight:500;
+    font-size:12.5px;
+    cursor:pointer;
+    background:var(--bg);
+    color:var(--ink);
+  }
+  .slot-form button.save{background:var(--accent); color:#fff; border-color:var(--accent);}
+  .slot-form button.release{background:var(--surface); color:var(--busy); border-color:var(--busy);}
+  .month-summary{
+    display:flex;
+    gap:8px;
+    margin-top:14px;
+    padding-top:14px;
+    border-top:1px solid var(--border);
+  }
+  .summary-chip{
+    flex:1;
+    background:var(--accent-soft);
+    border-radius:10px;
+    padding:8px 12px;
+    text-align:center;
+  }
+  .summary-chip small{
+    display:block;
+    font-size:10px;
+    color:var(--ink-soft);
+    margin-bottom:2px;
+  }
+  .summary-chip strong{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:16px;
+    color:var(--accent);
+  }
+  .empty-msg{font-size:13px; color:var(--ink-soft);}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="stamp">Agenda Fisio</span>
+  <p class="subtitle">Toca un día · las horas de cada cita se pueden ajustar</p>
+  <div class="demo-badge">Guardado automático · tus datos viven solo en este teléfono</div>
+  <div class="backup-row">
+    <button class="backup-btn" onclick="exportBackup()">⬇ Descargar copia de seguridad</button>
+    <label class="backup-btn" for="import-file">⬆ Restaurar copia de seguridad</label>
+    <input type="file" id="import-file" accept="application/json" style="display:none;" onchange="importBackup(event)">
+  </div>
+</header>
+
+<div class="tabs" id="tabs"></div>
+<div class="legend">
+  <span><i class="dot free"></i> libre</span>
+  <span><i class="dot partial"></i> algunos huecos</span>
+  <span><i class="dot busy"></i> completo</span>
+</div>
+<main id="main"></main>
+
+<script>
+const MONTH_NAMES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+const DOW = ["L","M","X","J","V","S","D"];
+const QUARTERS = [
+  {label:"T1", months:[0,1,2]},
+  {label:"T2", months:[3,4,5]},
+  {label:"T3", months:[6,7,8]},
+  {label:"T4", months:[9,10,11]},
+];
+const TODAY = new Date(); // fecha real de hoy
+
+// Horario base de la consulta (orientativo: cada cita puede salirse de esta rejilla)
+const DAY_START = 9*60;   // 09:00 en minutos
+const DAY_END   = 21*60;  // 21:00 en minutos
+const DEFAULT_DURATION = 45;
+
+// ---------------------------------------------------------------
+// Guardado permanente en el propio teléfono (localStorage).
+// No sale de este dispositivo, no hay servidor ni conexión externa.
+// ---------------------------------------------------------------
+const STORAGE_KEY = 'agendaFisio.citas.v1';
+
+function loadAppointments(){
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch(e){
+    console.warn('No se pudo leer el almacenamiento local, se usará solo en memoria.', e);
+    return {};
+  }
+}
+function persistAppointments(){
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(appointmentsByDay));
+  } catch(e){
+    console.warn('No se pudo guardar en el almacenamiento local.', e);
+  }
+}
+
+// Descarga un archivo .json con todas las citas guardadas
+function exportBackup(){
+  const payload = {
+    app: 'Agenda Fisio',
+    exportedAt: new Date().toISOString(),
+    appointmentsByDay
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const fecha = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `agenda-fisio-copia-${fecha}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Restaura las citas desde un archivo .json exportado previamente
+function importBackup(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      const incoming = data.appointmentsByDay || data; // admite el archivo con o sin la envoltura
+      if(typeof incoming !== 'object' || incoming === null) throw new Error('Formato no reconocido');
+
+      const ok = confirm('Esto reemplazará todas las citas actuales guardadas en este teléfono por las del archivo. ¿Continuar?');
+      if(!ok){ event.target.value = ''; return; }
+
+      Object.keys(appointmentsByDay).forEach(k => delete appointmentsByDay[k]);
+      Object.assign(appointmentsByDay, incoming);
+      persistAppointments();
+      selectedDate = null;
+      openKey = null;
+      renderMonths();
+      alert('Copia restaurada correctamente.');
+    } catch(e){
+      alert('No se ha podido leer este archivo como copia de seguridad válida.');
+    }
+    event.target.value = ''; // permite volver a elegir el mismo archivo si hace falta
+  };
+  reader.readAsText(file);
+}
+
+// Citas guardadas: clave "y-m-d" -> array de {id, start(min), duration(min), name, phone, rate}
+const appointmentsByDay = loadAppointments();
+let nextId = Date.now(); // base para ids únicos de citas nuevas
+
+function dayKey(y,m,d){ return `${y}-${m}-${d}`; }
+function minToStr(min){ const h=Math.floor(min/60), mi=min%60; return `${String(h).padStart(2,'0')}:${String(mi).padStart(2,'0')}`; }
+function strToMin(str){ const [h,mi] = str.split(':').map(Number); return h*60+mi; }
+
+// Si un día laborable todavía no existe en los datos guardados, lo deja vacío (sin citas de ejemplo)
+function ensureSeed(y,m,d){
+  const key = dayKey(y,m,d);
+  if(appointmentsByDay[key] !== undefined) return;
+  const date = new Date(y,m,d);
+  const dow = date.getDay();
+  appointmentsByDay[key] = (dow===0 || dow===6) ? null : [];
+}
+
+// Devuelve la lista del día ordenada por hora + los huecos libres calculados entre citas
+function getDayItems(y,m,d){
+  ensureSeed(y,m,d);
+  const key = dayKey(y,m,d);
+  const appts = appointmentsByDay[key];
+  if(appts === null) return { closed:true, items:[] };
+
+  const sorted = [...appts].sort((a,b)=>a.start-b.start);
+  const items = [];
+  let cursor = DAY_START;
+  sorted.forEach(a=>{
+    if(a.start > cursor){
+      items.push({type:'free', start:cursor, end:a.start});
+    }
+    items.push({type:'appt', ...a, end: a.start + a.duration});
+    cursor = Math.max(cursor, a.start + a.duration);
+  });
+  if(cursor < DAY_END){
+    items.push({type:'free', start:cursor, end:DAY_END});
+  }
+  return { closed:false, items };
+}
+
+function dayStatus(y,m,d){
+  const { closed, items } = getDayItems(y,m,d);
+  if(closed) return 'none';
+  const hasAppt = items.some(i=>i.type==='appt');
+  const hasFree = items.some(i=>i.type==='free' && i.end-i.start >= 15);
+  if(!hasAppt) return 'free';
+  if(!hasFree) return 'busy';
+  return 'partial';
+}
+
+let currentQuarter = QUARTERS.findIndex(q=>q.months.includes(TODAY.getMonth()));
+let selectedDate = null;
+let openKey = null; // 'appt-<id>' o 'free-<start>'
+
+function daysInMonth(y,m){ return new Date(y,m+1,0).getDate(); }
+function firstDowMonday(y,m){ const d = new Date(y,m,1).getDay(); return d===0?6:d-1; }
+
+// Suma las tarifas cobradas del 1-15 y del 16-fin de mes
+function quincenaTotals(y,m){
+  const total = daysInMonth(y,m);
+  let q1 = 0, q2 = 0;
+  for(let d=1; d<=total; d++){
+    ensureSeed(y,m,d);
+    const list = appointmentsByDay[dayKey(y,m,d)];
+    if(!list) continue;
+    list.forEach(a=>{
+      const rate = parseFloat(String(a.rate||'').replace(',', '.'));
+      if(!isNaN(rate)){
+        if(d <= 15) q1 += rate; else q2 += rate;
+      }
+    });
+  }
+  return { q1, q2 };
+}
+function fmtEuro(n){ return n.toLocaleString('es-ES', {minimumFractionDigits: n%1===0?0:2, maximumFractionDigits:2}) + ' €'; }
+
+function renderTabs(){
+  const tabs = document.getElementById('tabs');
+  tabs.innerHTML = '';
+  QUARTERS.forEach((q,i)=>{
+    const el = document.createElement('div');
+    el.className = 'tab' + (i===currentQuarter?' active':'');
+    el.textContent = q.label;
+    el.onclick = ()=>{ currentQuarter=i; selectedDate=null; renderTabs(); renderMonths(); };
+    tabs.appendChild(el);
+  });
+}
+
+function renderMonths(){
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+  const year = TODAY.getFullYear();
+  QUARTERS[currentQuarter].months.forEach(m=>{
+    const monthDiv = document.createElement('div');
+    monthDiv.className = 'month';
+    const title = document.createElement('div');
+    title.className = 'month-name';
+    title.textContent = MONTH_NAMES[m] + ' ' + year;
+    monthDiv.appendChild(title);
+
+    const grid = document.createElement('div');
+    grid.className = 'grid';
+    DOW.forEach(d=>{
+      const el = document.createElement('div');
+      el.className = 'dow';
+      el.textContent = d;
+      grid.appendChild(el);
+    });
+    const offset = firstDowMonday(year,m);
+    for(let i=0;i<offset;i++){
+      const el = document.createElement('div');
+      el.className = 'day empty';
+      grid.appendChild(el);
+    }
+    const total = daysInMonth(year,m);
+    for(let d=1; d<=total; d++){
+      const status = dayStatus(year,m,d);
+      const el = document.createElement('div');
+      el.className = 'day';
+      if(TODAY.getFullYear()===year && TODAY.getMonth()===m && TODAY.getDate()===d) el.classList.add('today');
+      if(selectedDate && selectedDate.y===year && selectedDate.m===m && selectedDate.d===d) el.classList.add('selected');
+      el.innerHTML = `<span>${d}</span><span class="dot ${status}"></span>`;
+      el.onclick = ()=>{ selectedDate = {y:year,m,d}; renderMonths(); };
+      grid.appendChild(el);
+    }
+    monthDiv.appendChild(grid);
+
+    const { q1, q2 } = quincenaTotals(year, m);
+    const lastDay = total;
+    const summary = document.createElement('div');
+    summary.className = 'month-summary';
+    summary.innerHTML = `
+      <div class="summary-chip">
+        <small>1–15</small>
+        <strong>${fmtEuro(q1)}</strong>
+      </div>
+      <div class="summary-chip">
+        <small>16–${lastDay}</small>
+        <strong>${fmtEuro(q2)}</strong>
+      </div>`;
+    monthDiv.appendChild(summary);
+
+    main.appendChild(monthDiv);
+
+    // Si el día seleccionado pertenece a ESTE mes, el panel de citas va justo aquí debajo,
+    // no al final de los tres meses del trimestre.
+    if(selectedDate && selectedDate.y===year && selectedDate.m===m){
+      const detailDiv = document.createElement('div');
+      detailDiv.className = 'detail';
+      detailDiv.id = 'detail';
+      detailDiv.innerHTML = buildDetailHtml(selectedDate.y, selectedDate.m, selectedDate.d);
+      main.appendChild(detailDiv);
+    }
+  });
+}
+
+function toggleKey(k){
+  openKey = (openKey===k) ? null : k;
+  renderMonths();
+}
+
+// Guarda una cita nueva (desde un hueco libre) o los cambios de una existente
+function saveAppt(y,m,d, id){
+  const name = document.getElementById(`in-name-${id}`).value.trim();
+  const startStr = document.getElementById(`in-start-${id}`).value;
+  const duration = parseInt(document.getElementById(`in-dur-${id}`).value, 10);
+  const phone = document.getElementById(`in-phone-${id}`).value.trim();
+  const rate = document.getElementById(`in-rate-${id}`).value.trim();
+
+  if(!name){ alert('Escribe al menos el nombre del paciente.'); return; }
+  if(!startStr){ alert('Indica la hora de inicio.'); return; }
+  if(!duration || duration <= 0){ alert('Indica una duración válida en minutos.'); return; }
+
+  const key = dayKey(y,m,d);
+  const list = appointmentsByDay[key] || [];
+  const start = strToMin(startStr);
+  const existing = list.find(a=>a.id===id);
+  if(existing){
+    existing.start = start; existing.duration = duration;
+    existing.name = name; existing.phone = phone; existing.rate = rate;
+  } else {
+    list.push({id, start, duration, name, phone, rate});
+  }
+  appointmentsByDay[key] = list;
+  persistAppointments();
+  openKey = null;
+  renderMonths();
+}
+
+function releaseAppt(y,m,d, id){
+  const key = dayKey(y,m,d);
+  appointmentsByDay[key] = (appointmentsByDay[key]||[]).filter(a=>a.id!==id);
+  persistAppointments();
+  openKey = null;
+  renderMonths();
+}
+
+// Genera el HTML del panel de citas/huecos de un día concreto (no toca el DOM directamente,
+// así renderMonths puede colocarlo justo debajo del mes al que pertenece)
+function buildDetailHtml(y,m,d){
+  const { closed, items } = getDayItems(y,m,d);
+  const dateLabel = `${d} de ${MONTH_NAMES[m]}`;
+  let html = `<div class="detail-title">${dateLabel}</div>`;
+
+  if(closed){
+    html += `<p class="empty-msg">Consulta cerrada este día.</p>`;
+    return html;
+  }
+
+  html += `<div class="slots">`;
+  items.forEach(item=>{
+    if(item.type==='appt'){
+      const k = 'appt-' + item.id;
+      const isOpen = openKey === k;
+      html += `<div class="slot-row booked">
+        <div class="slot-head" onclick="toggleKey('${k}')">
+          <span class="time">${minToStr(item.start)}–${minToStr(item.end)}</span>
+          <span class="who">${item.name}${item.rate ? ' · ' + item.rate + '€' : ''}</span>
+        </div>`;
+      if(isOpen){
+        html += `<div class="slot-form">
+          <div>
+            <label>Nombre del paciente</label>
+            <input id="in-name-${item.id}" value="${item.name}">
+          </div>
+          <div style="display:flex; gap:8px;">
+            <div style="flex:1;">
+              <label>Hora de inicio</label>
+              <input type="time" id="in-start-${item.id}" value="${minToStr(item.start)}">
+            </div>
+            <div style="flex:1;">
+              <label>Duración (min)</label>
+              <input type="number" step="5" id="in-dur-${item.id}" value="${item.duration}">
+            </div>
+          </div>
+          <div>
+            <label>Teléfono (opcional)</label>
+            <input id="in-phone-${item.id}" value="${item.phone||''}">
+          </div>
+          <div>
+            <label>Tarifa (€)</label>
+            <input id="in-rate-${item.id}" value="${item.rate||''}">
+          </div>
+          <div class="btn-row">
+            <button class="save" onclick="saveAppt(${y},${m},${d},${item.id})">Guardar cambios</button>
+            <button class="release" onclick="releaseAppt(${y},${m},${d},${item.id})">Liberar hora</button>
+          </div>
+        </div>`;
+      }
+      html += `</div>`;
+
+    } else {
+      // Hueco libre: se puede tocar para agendar, con hora y duración propuestas pero editables
+      const k = 'free-' + item.start;
+      const isOpen = openKey === k;
+      const gapMin = item.end - item.start;
+      const newId = 'new' + item.start; // id temporal único para esta cita nueva
+      html += `<div class="slot-row free">
+        <div class="slot-head" onclick="toggleKey('${k}')">
+          <span class="time">${minToStr(item.start)}–${minToStr(item.end)}</span>
+          <span class="who">${isOpen ? 'cerrar' : `libre (${gapMin} min) · toca para agendar`}</span>
+        </div>`;
+      if(isOpen){
+        html += `<div class="slot-form">
+          <div>
+            <label>Nombre del paciente</label>
+            <input id="in-name-${newId}" placeholder="Nombre y apellido">
+          </div>
+          <div style="display:flex; gap:8px;">
+            <div style="flex:1;">
+              <label>Hora de inicio</label>
+              <input type="time" id="in-start-${newId}" value="${minToStr(item.start)}">
+            </div>
+            <div style="flex:1;">
+              <label>Duración (min)</label>
+              <input type="number" step="5" id="in-dur-${newId}" value="${Math.min(DEFAULT_DURATION, gapMin) || DEFAULT_DURATION}">
+            </div>
+          </div>
+          <div>
+            <label>Teléfono (opcional)</label>
+            <input id="in-phone-${newId}" placeholder="600 000 000">
+          </div>
+          <div>
+            <label>Tarifa (€)</label>
+            <input id="in-rate-${newId}" placeholder="40">
+          </div>
+          <div class="btn-row">
+            <button class="save" onclick="saveAppt(${y},${m},${d}, ${JSON.stringify(newId)})">Guardar cita</button>
+          </div>
+        </div>`;
+      }
+      html += `</div>`;
+    }
+  });
+  html += `</div>`;
+  return html;
+}
+
+renderTabs();
+renderMonths();
+</script>
+</body>
+</html>
